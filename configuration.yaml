@@ -1,0 +1,148 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude 
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: !secret home_altitude
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/Los_Angeles
+
+  customize: !include customize.yaml
+
+# Enables the frontend
+frontend:
+
+# Enables the config panel
+config:
+
+script: !include scripts.yaml
+
+http:
+  # Uncomment this to add a password (recommended!)
+    api_password: !secret api_password
+  # Uncomment this if you are using SSL or running in Docker etc
+    base_url: !secret hass_ip
+
+# Checks for available updates
+updater:
+
+# Discover some devices automatically
+#discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+
+# Track the sun
+sun:
+
+twilio:
+  account_sid: !secret twilio_account_sid
+  auth_token: !secret twilio_auth_token
+
+notify:
+  - name: twilio
+    platform: twilio_sms
+    from_number: !secret twilio_from_number
+  - name: sms
+    platform: group
+    services:
+      - service: twilio
+        data:
+          target: 
+            - !secret justins_number
+            - !secret lis_number
+
+# Weather Prediction
+sensor:
+  - platform: yweather
+    monitored_conditions:
+      - weather
+      - weather_current
+      - wind_speed
+      - humidity
+      - temperature
+  - platform: template
+    sensors:
+      hub:
+        value_template: '{{
+          states.remote.Hub.attributes.current_activity }}'
+        friendly_name: 'TV activity'
+  - platform: template
+    sensors:
+      lock_battery:
+        value_template: '{{states.zwave.schlage_be469nxcen_touchscreen_deadbolt.attributes.battery_level }}'
+        friendly_name: 'Lock Battery Level'
+
+# Text to speech
+tts:
+  platform: google
+
+zwave:
+  device_config: !include zwave_device_config.yaml
+  usb_path: /dev/ttyACM0
+  config_path: /srv/homeassistant/src/open-zwave-control-panel/config
+  polling_interval: 5000
+
+remote:
+  - platform: harmony
+    name: Hub
+    host: !secret harmony_ip
+
+device_tracker:
+  - platform: bluetooth_tracker
+    track_new_devices: false 
+
+#   - platform: netgear
+#     host: !secret netgear_ip
+#     username: admin
+#     password: password
+
+light:
+  platform: hue
+  host: !secret hue_ip
+
+nest:
+  client_id: !secret nest_id
+  client_secret: !secret nest_secret
+
+emulated_hue:
+  host_ip: !secret emulated_hue_ip
+  type: alexa
+  listen_port: 8300
+  off_maps_to_on_domains:
+    - script
+  expose_by_default: true
+  exposed_domains:
+    - group
+    - script
+
+group: !include groups.yaml
+
+input_select:
+  tv:
+    name: TV Setting
+    options:
+     - XBOX ONE
+     - WII U
+     - RETRO GAMES
+     - PLAY XBOX 360
+     - PowerOff
+
+
+automation: !include automation.yaml
+ 
+
+
+
+

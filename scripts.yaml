@@ -1,0 +1,53 @@
+welcome_home:
+    alias: welcome home
+    sequence:
+        - service: homeassistant.turn_on
+          entity_id: group.downstairs
+        - service: lock.unlock
+          entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+goodbye:
+    alias: goodbye
+    sequence:
+        - service: homeassistant.turn_off
+          entity_id: group.house
+        - service: lock.lock
+          entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+        - service: remote.turn_off
+          entity_id: remote.Hub
+        - service: notify.sms
+          data: 
+            message: "Everyones leaving, locking up"
+
+
+goodnight:
+    alias: goodnight
+    sequence:
+        - service: homeassistant.turn_off
+          entity_id: group.downstairs
+        - service: homeassistant.turn_off
+          entity_id: group.upstairs
+        - service: lock.lock
+          entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+        - service: remote.turn_off
+          entity_id: remote.Hub
+        - service: homeassistant.turn_on
+          entity_id: script.close_shades
+
+open_shades:
+    alias: open the blinds
+    sequence:
+        - service: cover.open_cover
+          entity_id: group.all_covers
+
+close_shades:
+    alias: close the blinds
+    sequence:
+        - service: cover.close_cover
+          entity_id: 
+            - cover.lis_window_shade_level
+            - cover.unknown_id026e_unknown_type4353_id5a31_level
+        - service: cover.set_cover_position
+          entity_id: cover.fan_window_shade_level
+          data:
+            position: 40
+

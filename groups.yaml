@@ -1,0 +1,146 @@
+  lights:
+    view: yes
+    entities:
+      - group.kitchen
+      - group.livingroom
+      - group.entry
+      - group.bedroom
+      - group.office
+      - group.upstairs
+
+    
+  default_view:
+    view: yes
+    entities:
+      - group.tv
+      - group.weather
+      - group.motion_sensor
+      - group.lock
+      - group.bedroom_windows
+      - device_tracker.liss_iphone
+      - device_tracker.justins_iphone
+      - sensor.upstairs_nest_protect_smoke_status
+      - sensor.upstairs_nest_protect_co_status
+
+  lock:
+    entities:
+      - sensor.lock_battery
+      - lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+
+
+  automation:
+    view: yes
+    entities:
+      - group.all_automations 
+      - group.all_scripts
+  hue:
+    name: hue
+    entities:
+      - light.all
+
+  kitchen:
+    name: Kitchen
+    entities:
+      - switch.leviton_unknown_type1c02_id0334_switch
+      - light.kitchen_1
+      - light.kitchen_2
+      - light.kitchen3
+      - light.kitchen_4
+  
+
+  accent:
+    name: Accent 
+    entities: 
+      - light.tripod
+      - light.lr_strip
+      - light.livingroomaccent
+
+  livingroom:
+    name: Living Room
+    entities: 
+      - group.accent
+      - light.lrhall1
+      - light.lrhall2
+      - light.lrhall3
+      - light.lrfireplace
+      - light.stairs
+
+  office:
+    name: Office
+    entities:
+      - light.office_accent
+      - switch.ge_12727_inwall_smart_switch_toggle_switch
+
+  entry:
+    name: Entry
+    entities: 
+      - light.entry1
+      - light.entry2
+      - light.entry3
+  downstairs:
+    name: Downstairs
+    entities:
+      - group.livingroom
+      - group.kitchen
+      - group.entry
+  bedroom:
+    name: Bedroom
+    entities:
+      - light.bedroom_1
+      - light.bedroom_2
+      - light.bedroom_3
+
+  upstairs:
+    name: Upstairs
+    entities:
+      - group.bedroom
+      - group.office
+      - light.stairs
+      - light.uphall1
+      - light.uphall2
+
+  house:
+    name: House
+    entities:
+      - group.downstairs
+      - group.upstairs
+      - light.reading_lamp
+
+  tv:
+    name: TV
+    entities:
+      - sensor.hub
+      - input_select.tv
+
+  
+  motion_sensor:
+    name: Living Room Sensor
+    entities:
+      - binary_sensor.aeotec_zw100_multisensor_6_sensor
+      - sensor.aeotec_zw100_multisensor_6_luminance
+
+  bedroom_windows:
+    name: Bedroom Shades
+    entities:
+      - cover.lis_window_shade_level
+      - cover.fan_window_shade_level
+      - cover.unknown_id026e_unknown_type4353_id5a31_level
+
+  weather:
+      name: Weather
+      entities:
+        - sensor.yweather_condition
+        - sensor.yweather_current
+        - sensor.yweather_temperature
+        - sensor.yweather_humidity
+        - sensor.aeotec_zw100_multisensor_6_temperature
+        - sensor.aeotec_zw100_multisensor_6_relative_humidity
+        - sensor.yweather_wind_speed
+        - sun.sun
+
+
+
+
+  
+    
+

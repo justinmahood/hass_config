@@ -1,0 +1,200 @@
+
+
+- alias: "accent on switch on"
+  trigger:
+    platform: state
+    entity_id: switch.ge_12727_inwall_smart_switch_toggle_switch
+    to: 'on'
+  action:
+    service: light.turn_on
+    entity_id: 
+      - light.office_accent
+    data: 
+      brightness: 150
+  
+- alias: "accent only off on double tap in office"
+  trigger:
+    platform: state
+    entity_id:  switch.ge_12727_inwall_smart_switch_toggle_switch
+    to: 'off'
+  action:
+    service: light.turn_off
+    entity_id:
+      - light.office_accent
+
+- alias: "TV activity from input_select"
+  trigger:
+    platform: state
+    entity_id: input_select.tv
+  action:
+  - service: remote.turn_on
+    data_template:
+      entity_id: remote.Hub
+      activity: "{{trigger.to_state.state}}"
+
+- alias: "Update UI from Harmony changes"
+  trigger:
+    platform: state
+    entity_id: sensor.hub  
+  action:
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.tv
+        option: "{{trigger.to_state.state}}"
+
+- alias: "Update UI on HA start"
+  trigger:
+    platform: event
+    event_type: homeassistant_start
+  action: 
+    - delay:
+        minutes: 3
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.tv
+        option: "{{states.sensor.hub.state}}"
+
+- alias: "Turn on accent lights on motion"
+  trigger:
+    platform: state
+    entity_id: binary_sensor.aeotec_zw100_multisensor_6_sensor
+    to: 'on'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: group.downstairs
+        state: "off"
+  action:
+    service: homeassistant.turn_on
+    entity_id: group.accent
+
+- alias: "Turn off accent lights when no motion"
+  trigger:
+    platform: state
+    entity_id: binary_sensor.aeotec_zw100_multisensor_6_sensor
+    to: 'off'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: sun.sun
+        state: 'below_horizon'
+      - condition: state
+        entity_id: sensor.hub
+        state: 'PowerOff'
+  action:
+    service: homeassistant.turn_off
+    entity_id: group.accent
+
+- alias: "Keep accent lights on when tv is on"
+  trigger: 
+    platform: state
+    entity_id: group.downstairs
+    to: 'off'
+  condition:
+    - condition: state
+      entity_id: sensor.hub
+      state: 'XBOX ONE'
+  action:
+    service: homeassistant.turn_on
+    entity_id: group.accent
+
+- alias: "Goodbye"
+  trigger:
+    platform: state
+    entity_id: group.all_devices
+    to: 'not_home'
+  action:
+    service: homeassistant.turn_on
+    entity_id: script.goodbye
+
+- alias: "Welcome Home"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.justins_iphone
+      to: 'home'
+    - platform: state
+      entity_id: device_tracker.liss_iphone
+      to: 'home'
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: '06:00:00'
+        before: '21:00:00'
+  action:
+    - service: homeassistant.turn_on
+      entity_id: script.welcome_home
+    - service: notify.sms
+      data_template: 
+        message: Welcome home {{ trigger.to_state.name }} 
+
+
+- alias: turn on lights when front door is unlocked
+  trigger:
+    platform: state
+    entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+    to: 'unlocked'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.all_devices
+        state: 'not_home'
+  action:
+    service: homeassistant.turn_on
+    entity_id: group.downstairs
+
+- alias: turn off lights when front door locked
+  trigger:
+    platform: state
+    entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+    to: 'locked'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.all_devices
+        state: 'not_home'
+      - condition: state
+        entity_id: binary_sensor.aeotec_zw100_multisensor_6_sensor
+        state: 'off'
+  action:
+    service: homeassistant.turn_off
+    entity_id: group.house
+
+- alias: open the blinds at sunrise 
+  trigger:
+    platform: sun
+    event: sunrise
+  action:
+    service: homeassistant.turn_on
+    entity_id: script.open_shades
+    
+
+- alias: close the blinds at sunset
+  trigger:
+    platform: sun
+    event: sunset
+  action:
+    service: homeassistant.turn_on
+    entity_id: script.close_shades
+
+- alias: lock door 5 min after unlocking
+  trigger:
+    platform: state
+    entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+    to: 'unlocked'
+    for:
+      minutes: 5
+  action: 
+    service: lock.lock
+    entity_id: lock.schlage_be469nxcen_touchscreen_deadbolt_locked
+    
+
+
+
